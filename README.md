@@ -22,29 +22,43 @@ Below is a slightly contrived example showing a number of possible supported ope
 
 ``` bash
 
-a = Value(-4.0)
-b = Value(2.0)
-c = a + b
-d = a * b + b**3
-c += c + 1
-c += 1 + c + (-a)
-d += d * 2 + (b + a).relu()
-d += 3 * d + (b - a).relu()
-e = c - d
-f = e**2
-g = f / 2.0
-g += 10.0 / f
-ee = a.exp()
-tt = a.tanh()
-rr = a.relu()
-print(f'{g.data:.4f}') # prints 24.7041, the outcome of this forward pass
-g.backward()
-print(f'{a.grad:.4f}') # prints 138.8338, i.e. the numerical value of dg/da
-print(f'{b.grad:.4f}') # prints 645.5773, i.e. the numerical value of dg/db
+    std::cout << "--- Simple Test ---" << std::endl;
+
+    auto a = make_shared<Value>(-4.0);
+    auto b = make_shared<Value>(2.0);
+
+    auto c = a + b;
+    auto d = a * b + b->power(3);
+
+    c = c + c + 1;
+    c = c + 1 + c + (-a);
+
+    d = d + d * 2 + (b + a) -> relu();
+    d = d + 3 * d + (b - a)->relu();
+
+    auto e = c - d;
+    auto f = e -> power(2);
+
+    auto g = f / 2;
+    g = g + 10/f;
+
+    auto ee = a -> exp();
+    auto tt = a -> tanh();
+    auto rr = a -> relu();
+
+
+    cout << "Forward Pass \n";
+    cout <<"G : " <<  g -> _data << '\n';   // prints 24.7041,
+
+    cout << "---------Backward Pass-----------\n";
+    g -> backward();
+
+    cout << "dg/da : " << a -> _grad << '\n';  // prints 138.8338, i.e. the numerical value of dg/da
+    cout << "dg/db : " << b -> _grad << '\n';  // prints 645.5773, i.e. the numerical value of dg/db
 
 ```
 
 
 
 ## Training a Neural Net
-The notebook demo.ipynb provides a full demo of training an 2-layer neural network (MLP) with 2 hidden layers each of 4 nodes with sample inputs and desired outputs.This is achieved by initializing a neural net from micrograd.neural_net module and implementing a custom TanH activation function.
+The test.cpp provides a full demo of training an 2-layer neural network (MLP) with 2 hidden layers each of 4 nodes with sample inputs and desired outputs.This is achieved by initializing a neural net from MLP class and implementing a custom TanH activation function.
