@@ -62,3 +62,61 @@ Below is a slightly contrived example showing a number of possible supported ope
 
 ## Training a Neural Net
 The test.cpp provides a full demo of training an 2-layer neural network (MLP) with 2 hidden layers each of 4 nodes with sample inputs and desired outputs.This is achieved by initializing a neural net from MLP class and implementing a custom TanH activation function.
+
+``` bash
+
+        MLP n = MLP(3, {4, 4, 1});
+
+    // sample training
+    vector < vector < shared_ptr < Value> > > xs = {{make_shared<Value>(2.0), make_shared<Value>(3.0), make_shared<Value>(-1.0)}, 
+{make_shared<Value>(3.0), make_shared<Value>(-1.0), make_shared<Value>(0.5)},
+{make_shared<Value>(0.5), make_shared<Value>(1.0), make_shared<Value>(1.0)},
+{make_shared<Value>(1.0), make_shared<Value>(1.0), make_shared<Value>(-1.0)}};
+
+     vector < shared_ptr<Value> > ys = {make_shared<Value>(1.0), make_shared<Value>(-1.0), make_shared<Value>(-1.0), make_shared<Value>(1.0)};
+
+     
+    //optimisation
+    double lr = 0.05;   // learning rate
+
+    for (int step = 0; step < 5; ++step){
+
+        //forward pass
+        vector < shared_ptr<Value > > y_pred;
+
+        for(int i = 0; i < xs.size(); ++i){
+            auto x = xs[i];
+            auto y = n(x)[0];
+            y_pred.push_back(y);
+
+        }
+
+        auto loss = make_shared<Value>(0.0);
+
+        for(int i = 0; i < xs.size(); ++i){
+            loss = loss + (ys[i] - y_pred[i]) * (ys[i] - y_pred[i]);
+        }
+
+        //change grads to 0
+        for(int i = 0; i < n.parameters().size(); ++i){
+            n.parameters()[i] -> _grad = 0.0;
+        }
+
+        //backward pass
+        loss -> backward();
+
+        //update the parameters
+        for(int i = 0; i < n.parameters().size(); ++i){
+            n.parameters()[i] -> _data += lr * -n.parameters()[i] -> _grad;
+        }
+
+        cout << "Loss : " << loss -> _data << "\n";
+
+        cout << "Predictions : \n";
+
+        for(int i = 0; i < xs.size(); ++i){
+            cout << y_pred[i] -> _data << " " << ys[i] -> _data << '\n';
+        }
+    }
+
+```
