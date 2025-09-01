@@ -1,7 +1,6 @@
 # 🧠 C-grad
 
 A minimalistic, educational implementation of a scalar-based automatic differentiation engine and a small neural network library built on top of it — all in pure C++.
-- The neural network library is an additional ~50 lines.
 - Operates on **scalar values only**, meaning each neuron is broken down into primitive operations like tiny adds and multiplies.
 - Despite its simplicity, this system can build and train full deep neural networks for classification / regression problems as well.
 - Inspired from Andrej Karpathy's Micrograd
