@@ -1,74 +1,33 @@
-
 //
 // Created by Saluvaji Vishal on 07/08/25.
 //
 
 #pragma once
+
 #include "Value.hpp"
 
-#include<random>
+#include <memory>
+#include <vector>
 
-random_device rd;
-mt19937 gen(rd());
-uniform_real_distribution<float> dist(-1.0, 1.0);
-
-class Neuron{
+/**
+ * Single neuron: y = tanh(w · x + b).
+ *
+ * `n` is the number of inputs (and therefore the number of weights).
+ * Weights and bias are Value leaves so they participate in autograd.
+ */
+class Neuron {
 private:
     int n;
+
 public:
+    std::vector<std::shared_ptr<Value>> weights;
+    std::shared_ptr<Value> bias;
 
-    vector <shared_ptr<Value> > weights;
-    shared_ptr<Value> bias;
+    explicit Neuron(int n);
 
-    Neuron(int n){
-        this -> n = n;
-        weights.resize(n);
+    /// Forward pass for one example `x` (length must equal `n`).
+    std::shared_ptr<Value> operator()(const std::vector<std::shared_ptr<Value>>& x);
 
-        for(int i = 0; i < n; ++i){
-            weights[i] = make_shared<Value>(dist(gen));
-        }
-
-        bias = make_shared<Value>(dist(gen));
-
-        // cout << "weights : \n";
-
-
-        // for(auto ele : weights){
-        //     cout << ele -> _data << ' ';
-        // }
-
-        // cout << "Bias : \n";
-
-        // cout << bias -> _data << "\n";
-    }
-
-    shared_ptr<Value> operator()(const vector < shared_ptr<Value> > &x){
-
-        // w[i] * x[i] + bias
-
-
-
-        auto out = make_shared<Value>(0.0);
-
-        for (int i = 0; i < n; ++i){
-            out = out + this -> weights[i] * x[i];
-        }
-
-        out = out + this -> bias;
-        out = out -> tanh();
-
-        return out;
-    }
-
-    vector < shared_ptr<Value> > parameters(){
-
-         vector < shared_ptr<Value> > params;
-
-         for(int i = 0; i < n; ++i){
-             params.push_back(weights[i]);
-         }
-         params.push_back(bias);
-
-         return params;
-    }
+    /// Trainable parameters: weights followed by bias.
+    std::vector<std::shared_ptr<Value>> parameters();
 };

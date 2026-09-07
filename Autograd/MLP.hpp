@@ -1,52 +1,30 @@
-
 //
 // Created by Saluvaji Vishal on 07/08/25.
 //
 
 #pragma once
+
 #include "Layer.hpp"
 
-using namespace std;
+#include <memory>
+#include <vector>
 
-class MLP{
+/**
+ * Multi-layer perceptron: a sequence of dense tanh layers.
+ *
+ * `input_size` is the width of the first layer's input.
+ * `layers_size` lists the neuron count of each layer, including the output.
+ * Example: MLP(3, {4, 4, 1}) is 3 -> 4 -> 4 -> 1.
+ */
+class MLP {
 private:
-    vector < Layer > layers;
-    int n;
+    std::vector<Layer> layers;
+    int n;  // number of layers
+
 public:
-    MLP(int input_size, vector < int > layers_size){
+    MLP(int input_size, std::vector<int> layers_size);
 
-        this -> n = layers_size.size();    // including output layer
+    std::vector<std::shared_ptr<Value>> operator()(std::vector<std::shared_ptr<Value>> x);
 
-        vector < int > sz;
-        sz.push_back(input_size);
-
-        for(auto &layer_size : layers_size){
-            sz.push_back(layer_size);
-        }
-
-        for(int i = 0; i < layers_size.size(); ++i){
-            layers.emplace_back(sz[i], sz[i + 1]);
-        }
-    }
-
-    vector<shared_ptr<Value> > operator()(vector < shared_ptr<Value> > x){
-
-        for(int i = 0; i < n; ++i){
-            x = layers[i](x);
-        }
-
-        return x;
-    }
-
-    vector<shared_ptr<Value> > parameters(){
-
-        vector<shared_ptr<Value> > params;
-
-        for(int i = 0;i < n; ++i){
-            auto layer_params = layers[i].parameters();
-            params.insert(params.end(), layer_params.begin(), layer_params.end());
-        }
-
-        return params;
-    }
+    std::vector<std::shared_ptr<Value>> parameters();
 };
